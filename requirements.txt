@@ -1,0 +1,9 @@
+Flask
+pandas
+pymysql
+lxml
+cryptography
+datetime
+bs4
+urllib3
+mysql-connector-python
