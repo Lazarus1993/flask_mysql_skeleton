@@ -1,6 +1,5 @@
 Flask
 pandas
-pymysql
 lxml
 cryptography
 datetime

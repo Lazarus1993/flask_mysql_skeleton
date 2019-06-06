@@ -1,8 +1,24 @@
 from urllib.request import Request, urlopen
 from datetime import datetime
 import bs4 as bs
-import pymysql
 import mysql.connector
+import requests
+
+
+
+def source_website_health_gold():
+    response = requests.get(f'https://www.investing.com/commodities/gold-historical-data')
+    if response.ok:
+        return response.text
+    else:
+        return 'Bad Response'
+
+def source_website_health_silver():
+    response = requests.get(f'https://www.investing.com/commodities/silver-historical-data')
+    if response.ok:
+        return response.text
+    else:
+        return 'Bad Response'
 
 """FOR GOLD"""
 #Web Scraping from the given URL
@@ -41,20 +57,15 @@ for row in rows[1:len(rows)-1]:
     SilverPrices.append(float(price))
 
 #Storing data into a table in a MySQL DB.
-"""
-conn = pymysql.connect(host='db',port=3306 ,user='root',password='root')
-"""
 config = {
     'user': 'root',
     'password': 'yourpasswd',
-    'host': 'mysql',
-    'port': '3306'
+    'host': 'localhost',
+    'port': '3306',
+    'database': 'bigdatafed'
 }
 conn = mysql.connector.connect(**config)
 a = conn.cursor()
-sql = 'CREATE DATABASE IF NOT EXISTS bigdatafed;'
-a.execute(sql)
-conn.commit()
 sql = 'USE bigdatafed;'
 a.execute(sql)
 conn.commit()
@@ -69,4 +80,3 @@ conn.commit()
 a.close()
 conn.close()
 print("Data successfully stored in DB")
-
