@@ -3,6 +3,7 @@ from datetime import datetime
 import bs4 as bs
 import mysql.connector
 import requests
+import os
 
 
 
@@ -20,19 +21,23 @@ def source_website_health_silver():
     else:
         return 'Bad Response'
 
-"""FOR GOLD"""
-#Web Scraping from the given URL
-req = Request('https://www.investing.com/commodities/gold-historical-data', headers={'User-Agent': 'Mozilla/5.0'})
-webpage = urlopen(req).read()
-soup = bs.BeautifulSoup(webpage,'lxml')
-table = soup.find('div',id="results_box")
-rows = table.find_all('tr')
+def webScraping(url):
+    req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    webpage = urlopen(req).read()
+    soup = bs.BeautifulSoup(webpage,'lxml')
+    table = soup.find('div',id="results_box")
+    rows = table.find_all('tr')
+    return rows
 
-#Extracting the Dates and Price from the scraped data
-labels = rows[0].text
 Dates = []
 GoldPrices = []
 SilverPrices = []
+
+"""FOR GOLD"""
+rows = webScraping('https://www.investing.com/commodities/gold-historical-data')
+
+#Extracting the Dates and Price from the scraped data
+labels = rows[0].text
 for row in rows[1:len(rows)-1]:
     splitted = row.text.splitlines()
     #Sanitizing the input and converting it into desired format
@@ -43,12 +48,7 @@ for row in rows[1:len(rows)-1]:
     GoldPrices.append(float(price))
 
 """FOR SILVER"""
-#Web Scraping from the given URL
-req = Request('https://www.investing.com/commodities/silver-historical-data', headers={'User-Agent': 'Mozilla/5.0'})
-webpage = urlopen(req).read()
-soup = bs.BeautifulSoup(webpage,'lxml')
-table = soup.find('div',id="results_box")
-rows = table.find_all('tr')
+rows = webScraping('https://www.investing.com/commodities/silver-historical-data')
 
 for row in rows[1:len(rows)-1]:
     splitted = row.text.splitlines()
@@ -59,16 +59,13 @@ for row in rows[1:len(rows)-1]:
 #Storing data into a table in a MySQL DB.
 config = {
     'user': 'root',
-    'password': 'yourpasswd',
-    'host': 'mysql',
-    'port': '3306',
-    'database': 'bigdatafed'
-}
+    'password': os.environ['MYSQL_ROOT_PASSWORD'],
+    'host': os.environ['MYSQL_HOST'],
+    'port': os.environ['MYSQL_PORT'],
+    'database': os.environ['MYSQL_DATABASE']
+    }
 conn = mysql.connector.connect(**config)
 a = conn.cursor()
-sql = 'USE bigdatafed;'
-a.execute(sql)
-conn.commit()
 sql = 'CREATE TABLE IF NOT EXISTS commodity_pricing (date VARCHAR(20), gold_pricing DOUBLE(10,2), silver_pricing DOUBLE(10,2));'
 a.execute(sql)
 conn.commit()

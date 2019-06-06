@@ -2,6 +2,7 @@ from flask import Flask,request
 import pandas as pd
 import mysql.connector
 import json
+import os
 
 app = Flask(__name__)
 
@@ -22,10 +23,10 @@ def fetchFromDB(start_date,end_date,commodity_type):
     #Fetching data from MySQL DB
     config = {
     'user': 'root',
-    'password': 'yourpasswd',
-    'host': 'mysql',
-    'port': '3306',
-    'database': 'bigdatafed'
+    'password': os.environ['MYSQL_ROOT_PASSWORD'],
+    'host': os.environ['MYSQL_HOST'],
+    'port': os.environ['MYSQL_PORT'],
+    'database': os.environ['MYSQL_DATABASE']
     }
     conn = mysql.connector.connect(**config)
     df = pd.read_sql('SELECT * FROM commodity_pricing', con=conn)

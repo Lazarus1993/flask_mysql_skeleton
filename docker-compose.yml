@@ -4,6 +4,11 @@ services:
     build: .
     links:
       - mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: yourpasswd
+      MYSQL_DATABASE: bigdatafed
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
     ports:
       - "8080:8080"
     depends_on:
@@ -11,14 +16,23 @@ services:
         condition: service_healthy
   mysql:
     image: mysql:5.7
-    restart: always
     ports:
       - "32000:3306"
     environment:
       MYSQL_ROOT_PASSWORD: yourpasswd
+      MYSQL_DATABASE: bigdatafed
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "-uroot",
+          "-pyourpasswd",
+          "ping",
+          "-h",
+          "localhost",
+        ]
       timeout: 20s
       retries: 10
