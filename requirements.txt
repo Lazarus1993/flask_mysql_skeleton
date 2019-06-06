@@ -6,3 +6,5 @@ datetime
 bs4
 urllib3
 mysql-connector-python
+requests
+unittest2

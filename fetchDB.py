@@ -23,7 +23,7 @@ def fetchFromDB(start_date,end_date,commodity_type):
     config = {
     'user': 'root',
     'password': 'yourpasswd',
-    'host': 'localhost',
+    'host': 'mysql',
     'port': '3306',
     'database': 'bigdatafed'
     }

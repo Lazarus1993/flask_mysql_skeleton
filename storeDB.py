@@ -60,7 +60,7 @@ for row in rows[1:len(rows)-1]:
 config = {
     'user': 'root',
     'password': 'yourpasswd',
-    'host': 'localhost',
+    'host': 'mysql',
     'port': '3306',
     'database': 'bigdatafed'
 }
